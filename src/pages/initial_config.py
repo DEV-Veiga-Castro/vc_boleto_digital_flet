@@ -75,6 +75,7 @@ class InitialConfig(ft.View):
 
         def set_items_menu(data: List[str], texto_value: ft.Text) -> List[ft.PopupMenuItem]:
             items_menu = [
+                ft.PopupMenuItem(),
                 ft.PopupMenuItem(
                     content=mov,
                     data=mov,
@@ -231,9 +232,9 @@ class InitialConfig(ft.View):
                                     ),
                                     bgcolor=Colors.CINZA_CONTAINER,
                                     shadow=ft.BoxShadow(
-                                        blur_radius=2,
-                                        color=ft.Colors.WHITE,
-                                        offset=ft.Offset(2, 4)
+                                        blur_radius=1,
+                                        color=ft.Colors.GREY,
+                                        offset=ft.Offset(1, 3)
                                     ),
                                     margin=ft.Margin(
                                         top=20
@@ -277,9 +278,9 @@ class InitialConfig(ft.View):
                                     ),
                                     bgcolor=Colors.CINZA_CONTAINER,
                                     shadow=ft.BoxShadow(
-                                        blur_radius=2,
-                                        color=ft.Colors.WHITE,
-                                        offset=ft.Offset(2, 4)
+                                        blur_radius=1,
+                                        color=ft.Colors.GREY,
+                                        offset=ft.Offset(1, 3)
                                     ),
                                     margin=ft.Margin(
                                         top=20
@@ -309,14 +310,22 @@ class InitialConfig(ft.View):
                                                     left=20
                                                 ),
                                             ),
+                                            ft.IconButton(
+                                                icon=ft.Icon(
+                                                    icon=ft.Icons.LOCK_PERSON_OUTLINED,
+                                                    size=40,
+                                                    color=ft.Colors.GREY
+                                                ),
+                                                disabled=True,
+                                            )
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     ),
                                     bgcolor=Colors.CINZA_CONTAINER,
                                     shadow=ft.BoxShadow(
-                                        blur_radius=2,
-                                        color=ft.Colors.WHITE,
-                                        offset=ft.Offset(2, 4)
+                                        blur_radius=1,
+                                        color=ft.Colors.GREY,
+                                        offset=ft.Offset(1, 3)
                                     ),
                                     margin=ft.Margin(
                                         top=20
@@ -336,20 +345,31 @@ class InitialConfig(ft.View):
                                             ft.Column(
                                                 controls=[
                                                     ft.Text(
-                                                        "OI"
+                                                        "OBSERVAÇÕES"
                                                     ),
-                                                    ft.Text(
-                                                        "Oi"
+                                                    ft.TextField(
+                                                        hint_text="Adicione detalhes importantes sobre esta movimentação",
+                                                        multiline=True,
+                                                        min_lines=1,
+                                                        max_lines=3,
+                                                        height=page.height * 0.1,
+                                                        border=ft.InputBorder.NONE,
+                                                        width=page.width * 0.8
                                                     )
-                                                ]
+                                                ],
+                                                alignment=ft.MainAxisAlignment.START,
+                                                margin=ft.Margin(
+                                                    left=20,
+                                                    top=20
+                                                ),
                                             )
                                         ]
                                     ),
                                     bgcolor=Colors.CINZA_CONTAINER,
                                     shadow=ft.BoxShadow(
-                                        blur_radius=2,
-                                        color=ft.Colors.WHITE,
-                                        offset=ft.Offset(2, 4)
+                                        blur_radius=1,
+                                        color=ft.Colors.GREY,
+                                        offset=ft.Offset(1, 3)
                                     ),
                                     margin=ft.Margin(
                                         top=20
