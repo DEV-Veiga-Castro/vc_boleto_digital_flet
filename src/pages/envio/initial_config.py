@@ -2,10 +2,11 @@ from typing import List
 
 import flet as ft
 
+from components.header import Header
 from style.style import Colors
 
-class InitialConfig(ft.View):
-    def __init__(self, mode, page: ft.Page):
+class InitialConfigEnvio(ft.View):
+    def __init__(self, page: ft.Page):
         super().__init__()
 
         self.spacing = 0
@@ -18,48 +19,6 @@ class InitialConfig(ft.View):
         self.expand = True
 
         self.route = "/initial_config"
-
-        self.bottom_appbar = ft.BottomAppBar(
-            content=ft.Row(
-                controls=[
-                    ft.Button(
-                        content=ft.Row(
-                            controls=[
-                                ft.Text(
-                                    value="CONTINUAR",
-                                    style=ft.TextStyle(
-                                        color=ft.Colors.WHITE,
-                                        size=18
-                                    )
-                                ),
-                                ft.Icon(
-                                    icon=ft.Icons.ARROW_RIGHT_ROUNDED,
-                                    size=26,
-                                    color=ft.Colors.WHITE
-                                )
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            spacing=5
-                        ),
-                        bgcolor=Colors.VERDE_BOTI,
-                        elevation=2,
-                        style=ft.ButtonStyle(
-                            shape=ft.RoundedRectangleBorder(
-                                radius=30
-                            ),
-                            shadow_color=ft.Colors.GREY_700
-                        ),
-                        width=page.width * 0.9,
-                        height=40,
-                    )
-                ],
-                expand=True,
-                alignment=ft.MainAxisAlignment.CENTER,
-            ),
-            bgcolor=ft.Colors.TRANSPARENT,
-        )
-
-        self.mode = mode # Modo da Movimentação => RECEBIMENTO || ENVIO
 
         tipos_mov = [
             "REGULAR",
@@ -75,7 +34,6 @@ class InitialConfig(ft.View):
 
         def set_items_menu(data: List[str], texto_value: ft.Text) -> List[ft.PopupMenuItem]:
             items_menu = [
-                ft.PopupMenuItem(),
                 ft.PopupMenuItem(
                     content=mov,
                     data=mov,
@@ -117,61 +75,11 @@ class InitialConfig(ft.View):
                 content=ft.Column(
                     controls=[
                         ft.Container(
-                            ft.AppBar(
-                                leading=ft.IconButton(
-                                    icon=ft.Icon(
-                                        icon=ft.Icons.ARROW_BACK_IOS_ROUNDED,
-                                        color=ft.Colors.WHITE
-                                    )
-                                ),
-                                title=ft.Column(
-                                    controls=[
-                                        ft.Text(
-                                            value="PASSO 01 de 03",
-                                            size=16,
-                                            color=ft.Colors.WHITE
-                                        ),
-                                        ft.Text(
-                                            value="Configuração Inicial",
-                                            size=24,
-                                            color=ft.Colors.WHITE
-                                        )
-                                    ]
-                                ),
-                                actions=[
-                                    ft.Container(
-                                        content=ft.Row(
-                                            controls=[
-                                                ft.Container(
-                                                    content=ft.Text(" "),
-                                                    bgcolor=ft.Colors.GREEN,
-                                                    width=40,
-                                                    height=10,
-                                                    border_radius=30
-                                                ),
-                                                ft.Container(
-                                                    content=ft.Text(" "),
-                                                    bgcolor=ft.Colors.WHITE,
-                                                    width=20,
-                                                    height=10,
-                                                    border_radius=30
-                                                ),
-                                                ft.Container(
-                                                    content=ft.Text(" "),
-                                                    bgcolor=ft.Colors.WHITE,
-                                                    width=20,
-                                                    height=10,
-                                                    border_radius=30
-                                                )
-                                            ],
-                                            spacing=2
-                                        ),
-                                        padding=ft.Padding(
-                                            right=15
-                                        )
-                                    )
-                                ],
-                                bgcolor=ft.Colors.TRANSPARENT
+                            content=Header(
+                                "Configuração Inicial", 
+                                [1, 3], 
+                                page, 
+                                "/"
                             ),
                             padding=ft.Padding(
                                 top=10,
@@ -241,6 +149,7 @@ class InitialConfig(ft.View):
                                     ),
                                     height=80,
                                     width=page.width * 0.9,
+                                    border_radius=20
                                 ),
                             ],
                             expand=True,
@@ -287,6 +196,7 @@ class InitialConfig(ft.View):
                                     ),
                                     height=80,
                                     width=page.width * 0.9,
+                                    border_radius=20
                                 ),
                             ],
                             expand=True,
@@ -332,6 +242,7 @@ class InitialConfig(ft.View):
                                     ),
                                     height=80,
                                     width=page.width * 0.9,
+                                    border_radius=20
                                 ),
                             ],
                             expand=True,
@@ -376,6 +287,7 @@ class InitialConfig(ft.View):
                                     ),
                                     height=page.height * 0.2,
                                     width=page.width * 0.9,
+                                    border_radius=20,
                                     alignment=ft.Alignment.CENTER
                                 ),
                             ],
@@ -390,3 +302,44 @@ class InitialConfig(ft.View):
                 expand=True
             )
         ]
+
+        self.bottom_appbar = ft.BottomAppBar(
+                content=ft.Row(
+                    controls=[
+                        ft.Button(
+                            content=ft.Row(
+                                controls=[
+                                    ft.Text(
+                                        value="CONTINUAR",
+                                        style=ft.TextStyle(
+                                            color=ft.Colors.WHITE,
+                                            size=18
+                                        )
+                                    ),
+                                    ft.Icon(
+                                        icon=ft.Icons.ARROW_RIGHT_ROUNDED,
+                                        size=26,
+                                        color=ft.Colors.WHITE
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                spacing=5
+                            ),
+                            bgcolor=Colors.VERDE_BOTI,
+                            elevation=2,
+                            style=ft.ButtonStyle(
+                                shape=ft.RoundedRectangleBorder(
+                                    radius=30
+                                ),
+                                shadow_color=ft.Colors.GREY_700
+                            ),
+                            width=page.width * 0.9,
+                            height=40,
+                            on_click=lambda _ : page.run_task(page.push_route, "/insert_items_envio")
+                        )
+                    ],
+                    expand=True,
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                bgcolor=ft.Colors.TRANSPARENT,
+            )
