@@ -11,6 +11,8 @@ class HomePage(ft.View):
         self.padding = 0
         self.spacing = 0
 
+        self.bgcolor = Colors.BLACK_BACKGROUND
+
         self.scroll = ft.ScrollMode.ADAPTIVE
 
         # self.align = ft.MainAxisAlignment.CENTER
@@ -57,6 +59,7 @@ class HomePage(ft.View):
                             ),
                             icon_size=30,
                             icon_color=ft.Colors.WHITE,
+                            on_click=lambda _ : page.run_task(page.push_route, "/history")
                         )
                     ],
                     expand=True,
@@ -137,7 +140,7 @@ class HomePage(ft.View):
                             offset=ft.Offset(2, 4)
                         ),
                         alignment=ft.Alignment.CENTER,
-                        on_click=lambda _ : page.run_task(page.push_route, "/initial_config_envio")
+                        on_click=lambda _ : page.run_task(page.push_route, "/send/initial")
                     )
                 ],
                 margin=ft.Margin(

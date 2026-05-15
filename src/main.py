@@ -1,12 +1,15 @@
 import flet as ft
 
-from pages.envio.initial_config import InitialConfigEnvio
-from pages.envio.insert_items import InsertItems
-from pages.insert_itens import SendPage
+from pages.history import HistoryPage
+from pages.send.insert import SendItemsPage
+from pages.send.revision import SendRevisionPage
+from pages.send.initial import SendInitialPage
 from pages.home import HomePage
-from pages.loading_page import loading_page
+from pages.loading_page import LoadingPage
 from pages.login import LoginPage
-
+from pages.not_found import NotFoundPage
+from pages.test import TestPage
+from style.style import Colors
 
 async def main(page: ft.Page):
     page.update()
@@ -17,45 +20,35 @@ async def main(page: ft.Page):
     page.scroll = ft.ScrollMode.ADAPTIVE
     page.window.bgcolor = ft.Colors.TRANSPARENT
     page.theme_mode = ft.ThemeMode.DARK
+    page.bgcolor = Colors.BLACK_BACKGROUND
     # page.window.title_bar_hidden = True
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
-    def route_change():
-        page.views.clear()
-        print(f"Rota Atual: {page.route}")
-        page.views.append(
-            HomePage(page=page)
-        )
-        if page.route == "/loading":
-            page.views.append(
-                ft.View(
-                    route="/loading",
-                    controls=[
-                        loading_page(page)
-                    ]
-                )
-            )
-        if page.route == "/send":
-            page.views.append(
-                SendPage(page=page)
-            )
-        if page.route == "/login":
-            page.views.append(
-                LoginPage(page)
-            )
-        if page.route == "/initial_config_envio":
-            page.views.append(
-                InitialConfigEnvio(page=page)
-            )
-        if page.route == "/insert_items_envio":
-            page.views.append(
-                InsertItems(page=page)
-            )
+    router = {
+        "/": HomePage,
+        "/test": TestPage,
+        "/loading": LoadingPage,
+        "/login": LoginPage,
+        "/history": HistoryPage,
+        "/send/initial": SendInitialPage,
+        "/send/insert": SendItemsPage,
+        "/send/revision": SendRevisionPage
+    }
 
-                    
+    def route_change():
+        troute = ft.TemplateRoute(page.route)
+
+        page.views.clear()
+
+        if troute.route in router:
+            view_content = router[troute.route](page)
+            page.views.append(view_content)
+        else:
+            page.views.append(NotFoundPage(page))
         
         page.update()
+
 
     def view_pop(view):
         page.views.pop()
@@ -65,7 +58,7 @@ async def main(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
 
-    await page.push_route("/insert_items_envio")
+    await page.push_route("/history")
 
     route_change()
 
@@ -73,5 +66,6 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     ft.run(
         main,
-        assets_dir="assets"
+        assets_dir="assets",
+        upload_dir="upload"
     )

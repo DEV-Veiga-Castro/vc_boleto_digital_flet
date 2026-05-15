@@ -2,6 +2,8 @@ from typing import List
 
 import flet as ft
 
+from style.style import Colors
+
 class Header(ft.AppBar):
     def __init__(self, title: str, steps: List[int], page: ft.Page, route: str):
         super().__init__()
@@ -17,7 +19,7 @@ class Header(ft.AppBar):
                     container_actions.append(
                         ft.Container(
                             content=ft.Text(""),
-                            bgcolor=ft.Colors.GREEN, # Branco - Não Tela Atual || Verde - Tela Atual
+                            bgcolor=Colors.VERDE_BOTI, # Branco - Não Tela Atual || Verde - Tela Atual
                             width=40, # 40 caso seja a tela atual - 20 caso não
                             height=10,
                             border_radius=30

@@ -1,5 +1,7 @@
 import flet as ft
 
+from style.style import Colors
+
 class LoginPage(ft.View):
     def __init__(self, page: ft.Page):
         super().__init__()
@@ -7,6 +9,8 @@ class LoginPage(ft.View):
 
         self.padding = 0
         self.spacing = 0
+
+        self.bgcolor = Colors.BLACK_BACKGROUND
 
         self.controls = [
             ft.SafeArea(

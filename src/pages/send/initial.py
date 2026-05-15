@@ -5,7 +5,7 @@ import flet as ft
 from components.header import Header
 from style.style import Colors
 
-class InitialConfigEnvio(ft.View):
+class SendInitialPage(ft.View):
     def __init__(self, page: ft.Page):
         super().__init__()
 
@@ -13,6 +13,8 @@ class InitialConfigEnvio(ft.View):
         self.padding = 0
 
         self.scroll = ft.ScrollMode.ADAPTIVE
+
+        self.bgcolor = Colors.BLACK_BACKGROUND
 
         self.vertical_alignment = ft.MainAxisAlignment.START
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
@@ -335,7 +337,7 @@ class InitialConfigEnvio(ft.View):
                             ),
                             width=page.width * 0.9,
                             height=40,
-                            on_click=lambda _ : page.run_task(page.push_route, "/insert_items_envio")
+                            on_click=lambda _ : page.run_task(page.push_route, "/send/insert")
                         )
                     ],
                     expand=True,
