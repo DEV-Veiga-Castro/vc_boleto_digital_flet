@@ -12,11 +12,11 @@ from components.camera import State, camera_label
 from components.header import Header
 from style.style import Colors
 
-class SendItemsPage(ft.View):
+class ReceiveItemsPage(ft.View):
     def __init__(self, page: ft.Page):
         super().__init__()
 
-        self.route = "/send/insert"
+        self.route = "/receive/insert"
 
         self.image_counter = 0
 
@@ -124,7 +124,7 @@ class SendItemsPage(ft.View):
                                 "Inserção de Itens", 
                                 [2, 3], 
                                 page, 
-                                "/send/initial"
+                                "/receive/initial"
                             ),
                             padding=ft.Padding(
                                 top=10,
@@ -273,7 +273,7 @@ class SendItemsPage(ft.View):
                         ),
                         width=page.width * 0.6,
                         height=40,
-                        on_click=lambda _ : page.run_task(page.push_route, "/send/revision")
+                        on_click=lambda _ : page.run_task(page.push_route, "/receive/revision")
                     )
                 ],
                 expand=True,

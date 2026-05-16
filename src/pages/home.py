@@ -196,7 +196,8 @@ class HomePage(ft.View):
                             color=Colors.VERDE_BOTI,
                             offset=ft.Offset(2, 4)
                         ),
-                        alignment=ft.Alignment.CENTER
+                        alignment=ft.Alignment.CENTER,
+                        on_click=lambda _ : page.run_task(page.push_route, "/receive/initial")
                     )
                 ],
                 margin=ft.Margin(

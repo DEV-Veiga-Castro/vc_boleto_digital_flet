@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 import flet as ft
@@ -67,52 +68,7 @@ class HistoryPage(ft.View):
 
         self.lista_transferencias = []
 
-        for i in range(10):
-            self.lista_transferencias.append(
-                ft.Container(
-                    content=ft.Row(
-                        controls=[
-                            ft.Column(
-                                controls=[
-                                    ft.Text(
-                                        value="VC-001",
-                                        color=ft.Colors.WHITE,
-                                        size=16,
-                                        weight=ft.FontWeight.W_500
-                                    ),
-                                    ft.Text(
-                                        value="Loja Origem: 4178",
-                                        color=ft.Colors.GREY,
-                                        size=12
-                                    ),
-                                    ft.Text(
-                                        value="Data",
-                                        color=ft.Colors.GREY,
-                                        size=12
-                                    )
-                                ],
-                                spacing=2
-                            ),
-                            ft.Column(
-                                controls=[
-                                    ft.Text(
-                                        value="REGULAR",
-                                        color=ft.Colors.WHITE,
-                                        size=16,
-                                        weight=ft.FontWeight.W_500,
-                                    ),
-                                    ft.Container(height=10),
-                                    ft.Container(height=10)
-                                ],
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                    ),
-                    bgcolor=Colors.CINZA_CONTAINER,
-                    border_radius=10,
-                    padding=20
-                )
-            )
+        self.content = [ft.Text("Oi"), ft.Text("Ola")]
 
         self.controls = [
             ft.SafeArea(
@@ -199,9 +155,6 @@ class HistoryPage(ft.View):
                                                 ],
                                                 alignment=ft.Alignment.CENTER
                                             ),
-                                            ft.Container(
-                                                height=10
-                                            )
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                         expand=True,
@@ -237,9 +190,6 @@ class HistoryPage(ft.View):
                                                 ],
                                                 alignment=ft.Alignment.CENTER
                                             ),
-                                            ft.Container(
-                                                height=10
-                                            )
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                         expand=True,
@@ -339,11 +289,50 @@ class HistoryPage(ft.View):
             )
         ]
 
+        self.navigation_bar = ft.NavigationBar(
+            destinations=[
+                ft.NavigationBarDestination(
+                    icon=ft.Icon(
+                        icon=ft.Icons.CALL_RECEIVED_ROUNDED,
+                        color=ft.Colors.WHITE
+                    ),
+                    selected_icon=ft.Icon(
+                        icon=ft.Icons.CALL_MISSED_ROUNDED,
+                        color=ft.Colors.WHITE
+                    ),
+                    label="Recebidas"
+                ),
+                ft.NavigationBarDestination(
+                    icon=ft.Icon(
+                        icon=ft.Icons.CALL_MADE_ROUNDED,
+                        color=ft.Colors.WHITE
+                    ),
+                    selected_icon=ft.Icon(
+                        icon=ft.Icons.CALL_MISSED_OUTGOING_ROUNDED,
+                        color=ft.Colors.WHITE
+                    ),
+                    label="Enviadas"
+                )
+            ],
+            bgcolor=ft.Colors.TRANSPARENT,
+            on_change=self.change_history_handler,
+            selected_index=0
+        )
+
+        page.run_task(self.load_data)
+
         page.update()
+
+    async def load_data(self):
+
+        await self.change_history_handler(None)
+
+        self.page.update()
 
     async def select_date_inicio(self, e):
         self.current_date_picker = "inicio"
         self.picker.value = self.data_inicio
+        self.picker.first_date = None
         self.picker.open = True
 
         self.page.show_dialog(self.picker)
@@ -351,6 +340,7 @@ class HistoryPage(ft.View):
 
     async def select_date_fim(self, e):
         self.current_date_picker = "fim"
+        self.picker.first_date = self.data_inicio
         self.picker.value = self.data_fim
         self.picker.open = True
 
@@ -377,3 +367,113 @@ class HistoryPage(ft.View):
     async def on_date_cancel(self, e):
         self.current_date_picker = None
         self.picker.open = False
+
+    async def change_history_handler(self, e):
+        selected_index = e.control.selected_index if e else 0
+
+        index_list = {
+            0: "recebidas",
+            1: "enviadas"
+        }
+
+        if selected_index in index_list:
+            print(index_list[selected_index])
+
+            if index_list[selected_index] == "recebidas":
+                self.lista_transferencias.clear()
+
+                for i in range(10):
+                    self.lista_transferencias.append(
+                        ft.Container(
+                            content=ft.Row(
+                                controls=[
+                                    ft.Column(
+                                        controls=[
+                                            ft.Text(
+                                                value="VC-001",
+                                                color=ft.Colors.WHITE,
+                                                size=16,
+                                                weight=ft.FontWeight.W_500
+                                            ),
+                                            ft.Text(
+                                                value="Loja Origem: 4178",
+                                                color=ft.Colors.GREY,
+                                                size=12
+                                            ),
+                                            ft.Text(
+                                                value="Data - Recebidas",
+                                                color=ft.Colors.GREY,
+                                                size=12
+                                            )
+                                        ],
+                                        spacing=2
+                                    ),
+                                    ft.Column(
+                                        controls=[
+                                            ft.Text(
+                                                value="REGULAR",
+                                                color=ft.Colors.WHITE,
+                                                size=16,
+                                                weight=ft.FontWeight.W_500,
+                                            ),
+                                            ft.Container(height=10),
+                                            ft.Container(height=10)
+                                        ],
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            ),
+                            bgcolor=Colors.CINZA_CONTAINER,
+                            border_radius=10,
+                            padding=20
+                        )
+                    )
+            else:
+                self.lista_transferencias.clear()
+
+                for i in range(10):
+                    self.lista_transferencias.append(
+                        ft.Container(
+                            content=ft.Row(
+                                controls=[
+                                    ft.Column(
+                                        controls=[
+                                            ft.Text(
+                                                value="VC-001",
+                                                color=ft.Colors.WHITE,
+                                                size=16,
+                                                weight=ft.FontWeight.W_500
+                                            ),
+                                            ft.Text(
+                                                value="Loja Origem: 4178",
+                                                color=ft.Colors.GREY,
+                                                size=12
+                                            ),
+                                            ft.Text(
+                                                value="Data - Enviadas",
+                                                color=ft.Colors.GREY,
+                                                size=12
+                                            )
+                                        ],
+                                        spacing=2
+                                    ),
+                                    ft.Column(
+                                        controls=[
+                                            ft.Text(
+                                                value="REGULAR",
+                                                color=ft.Colors.WHITE,
+                                                size=16,
+                                                weight=ft.FontWeight.W_500,
+                                            ),
+                                            ft.Container(height=10),
+                                            ft.Container(height=10)
+                                        ],
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            ),
+                            bgcolor=Colors.CINZA_CONTAINER,
+                            border_radius=10,
+                            padding=20
+                        )
+                    )

@@ -4,6 +4,9 @@ from pages.history import HistoryPage
 from pages.send.insert import SendItemsPage
 from pages.send.revision import SendRevisionPage
 from pages.send.initial import SendInitialPage
+from pages.receive.initial import ReceiveInitialPage
+from pages.receive.insert import ReceiveItemsPage
+from pages.receive.revision import ReceiveRevisionPage
 from pages.home import HomePage
 from pages.loading_page import LoadingPage
 from pages.login import LoginPage
@@ -33,7 +36,10 @@ async def main(page: ft.Page):
         "/history": HistoryPage,
         "/send/initial": SendInitialPage,
         "/send/insert": SendItemsPage,
-        "/send/revision": SendRevisionPage
+        "/send/revision": SendRevisionPage,
+        "/receive/initial": ReceiveInitialPage,
+        "/receive/insert": ReceiveItemsPage,
+        "/receive/revision": ReceiveRevisionPage
     }
 
     def route_change():
@@ -58,7 +64,7 @@ async def main(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
 
-    await page.push_route("/history")
+    await page.push_route("/receive/initial")
 
     route_change()
 
