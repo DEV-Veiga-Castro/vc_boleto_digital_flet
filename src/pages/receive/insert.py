@@ -450,3 +450,5 @@ class ReceiveItemsPage(ft.View):
         value = value[7:]
         value = value[:5]
         print(f"Código Reduzido: {value} - Tamanho: {len(value)}")
+        self.codigo_input.value = value
+        self.codigo_input.update()

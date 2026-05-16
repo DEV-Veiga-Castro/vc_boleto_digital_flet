@@ -1,5 +1,6 @@
 import flet as ft
 
+from api.auth.login import auth_login
 from style.style import Colors
 
 class LoginPage(ft.View):
@@ -12,8 +13,17 @@ class LoginPage(ft.View):
 
         self.bgcolor = Colors.BLACK_BACKGROUND
 
+        self.login = ""
+        self.password = ""
+
+        self.vertical_alignment = ft.MainAxisAlignment.START
+        self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+
+        self.expand = True
+
         self.controls = [
             ft.SafeArea(
+                expand = True,
                 content=ft.Column(
                     controls=[
                         ft.Container(
@@ -59,7 +69,6 @@ class LoginPage(ft.View):
                                     ft.Row(
                                         controls=[
                                             ft.TextField(
-                                                # label="Nome de Usuário",
                                                 hint_text="Nome de Usuário",
                                                 mouse_cursor=ft.MouseCursor.TEXT,
                                                 border_radius=30,
@@ -74,7 +83,8 @@ class LoginPage(ft.View):
                                                 label_style=ft.TextStyle(
                                                     color=ft.Colors.BLACK_45
                                                 ),
-                                                bgcolor=ft.Colors.WHITE
+                                                bgcolor=ft.Colors.WHITE,
+                                                on_change=self.handle_user
                                             )
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
@@ -82,7 +92,6 @@ class LoginPage(ft.View):
                                     ft.Row(
                                         controls=[
                                             ft.TextField(
-                                                # label="Senha",
                                                 hint_text="**********",
                                                 password=True,
                                                 can_reveal_password=True,
@@ -100,7 +109,7 @@ class LoginPage(ft.View):
                                                     color=ft.Colors.BLACK_45
                                                 ),
                                                 bgcolor=ft.Colors.WHITE,
-
+                                                on_change=self.handle_password,
                                             )
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
@@ -122,7 +131,7 @@ class LoginPage(ft.View):
                                                     ),
                                                     shadow_color=ft.Colors.GREY_700,
                                                 ),
-                                                on_click=lambda _ : page.run_task(page.push_route, "/") 
+                                                on_click=self.handle_login
                                             )
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER
@@ -161,6 +170,22 @@ class LoginPage(ft.View):
                         ),                       
                     ]
                 ),
-                expand=True
             )
         ]
+
+    async def handle_user(self, e):
+        self.login = e.control.value
+
+    async def handle_password(self, e):
+        self.password = e.control.value
+
+    async def handle_login(self, e):
+
+        if not self.password:
+            print("informe a senha")
+            return
+
+        r = await auth_login(self.page, self.login, self.password)
+
+        print(r)
+

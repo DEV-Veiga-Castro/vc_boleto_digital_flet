@@ -1,5 +1,4 @@
 import flet as ft
-import flet_camera as fc
 
 from style.style import Colors
 
