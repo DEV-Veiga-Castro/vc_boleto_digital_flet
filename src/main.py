@@ -64,7 +64,7 @@ async def main(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
 
-    await page.push_route("/login")
+    await page.push_route("/")
 
     route_change()
 

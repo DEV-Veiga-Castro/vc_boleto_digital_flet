@@ -385,3 +385,6 @@ class SendRevisionPage(ft.View):
             )
 
         ]
+
+    async def send_to_printer(self, e):
+        self.page.print
