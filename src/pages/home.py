@@ -1,10 +1,16 @@
 import flet as ft
 
+from api.clientstorage import ClientStorage
 from style.style import Colors
 
 class HomePage(ft.View):
     def __init__(self, page: ft.Page):
         super().__init__()
+
+        self.prefs = ft.SharedPreferences()
+        page.update()
+        self.storage = ClientStorage(self.prefs) 
+
         self.route = "/"
 
         self.padding = 0
@@ -31,7 +37,8 @@ class HomePage(ft.View):
                         padding=ft.Padding(
                             left=10
                         ),
-                        expand=True
+                        expand=True,
+                        on_click=self.handle_logout
                     ),
                     title=ft.Column(
                         controls=[
@@ -316,3 +323,32 @@ class HomePage(ft.View):
                 alignment=ft.MainAxisAlignment.CENTER
             )
         ]
+
+    async def handle_logout(self, e):
+        snackbar = ft.SnackBar(
+            content=ft.Text("Logout"),
+            duration=2000,
+            show_close_icon=True,
+        )
+
+        try:
+            await self.storage.clear_token()
+
+            await self.page.push_route("/login")
+
+            snackbar.content = ft.Text(
+                value="Usuário deslogado com sucesso!",
+                color=ft.Colors.WHITE
+            )
+            snackbar.bgcolor = Colors.VERDE_BOTI
+            self.page.show_dialog(snackbar)
+            self.page.update()
+
+        except Exception as e:
+
+            snackbar.content = ft.Text(
+                value=f"Erro: {e}!",
+                color=ft.Colors.WHITE
+                )
+            snackbar.bgcolor = Colors.VERMELHO_OUI
+            self.page.show_dialog(snackbar)

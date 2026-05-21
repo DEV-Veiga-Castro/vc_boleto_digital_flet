@@ -1,6 +1,9 @@
 import flet as ft
+from requests import Response
 
+from api.clientstorage import ClientStorage
 from api.auth.login import auth_login
+from appstate import AppState
 from style.style import Colors
 
 class LoginPage(ft.View):
@@ -8,18 +11,78 @@ class LoginPage(ft.View):
         super().__init__()
         self.route = "/login"
 
+        self.state = AppState()
+
         self.padding = 0
         self.spacing = 0
 
         self.bgcolor = Colors.BLACK_BACKGROUND
 
-        self.login = ""
-        self.password = ""
-
         self.vertical_alignment = ft.MainAxisAlignment.START
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
         self.expand = True
+
+        self.prefs = ft.SharedPreferences()
+        self.storage = ClientStorage(self.prefs)
+
+
+        self.login = ft.TextField(
+                        hint_text="Nome de Usuário",
+                        mouse_cursor=ft.MouseCursor.TEXT,
+                        border_radius=30,
+                        border=ft.InputBorder.OUTLINE,
+                        border_color=ft.Colors.TRANSPARENT,
+                        text_style=ft.TextStyle(
+                            color=ft.Colors.BLACK
+                        ),
+                        hint_style=ft.TextStyle(
+                            color=ft.Colors.BLACK_45
+                        ),
+                        label_style=ft.TextStyle(
+                            color=ft.Colors.BLACK_45
+                        ),
+                        bgcolor=ft.Colors.WHITE,
+                        # on_change=self.handle_user
+                    )
+
+        self.password = ft.TextField(
+                            hint_text="**********",
+                            password=True,
+                            can_reveal_password=True,
+                            mouse_cursor=ft.MouseCursor.TEXT,
+                            border_radius=30,
+                            border=ft.InputBorder.OUTLINE,
+                            border_color=ft.Colors.TRANSPARENT,
+                            text_style=ft.TextStyle(
+                                color=ft.Colors.BLACK
+                            ),
+                            hint_style=ft.TextStyle(
+                                color=ft.Colors.BLACK_45
+                            ),
+                            label_style=ft.TextStyle(
+                                color=ft.Colors.BLACK_45
+                            ),
+                            bgcolor=ft.Colors.WHITE,
+                        )
+        
+        self.login_button = ft.Button(
+                                content=ft.Text(
+                                    value="Entrar",
+                                    color=ft.Colors.WHITE
+                                ),
+                                width=180,
+                                height=45,
+                                bgcolor=ft.Colors.GREEN,
+                                elevation=5,
+                                style=ft.ButtonStyle(
+                                    shape=ft.RoundedRectangleBorder(
+                                        radius=30
+                                    ),
+                                    shadow_color=ft.Colors.GREY_700,
+                                ),
+                                on_click=self.handle_login
+                            )
 
         self.controls = [
             ft.SafeArea(
@@ -68,71 +131,19 @@ class LoginPage(ft.View):
                                     ),
                                     ft.Row(
                                         controls=[
-                                            ft.TextField(
-                                                hint_text="Nome de Usuário",
-                                                mouse_cursor=ft.MouseCursor.TEXT,
-                                                border_radius=30,
-                                                border=ft.InputBorder.OUTLINE,
-                                                border_color=ft.Colors.TRANSPARENT,
-                                                text_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK
-                                                ),
-                                                hint_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK_45
-                                                ),
-                                                label_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK_45
-                                                ),
-                                                bgcolor=ft.Colors.WHITE,
-                                                on_change=self.handle_user
-                                            )
+                                            self.login
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                     ),
                                     ft.Row(
                                         controls=[
-                                            ft.TextField(
-                                                hint_text="**********",
-                                                password=True,
-                                                can_reveal_password=True,
-                                                mouse_cursor=ft.MouseCursor.TEXT,
-                                                border_radius=30,
-                                                border=ft.InputBorder.OUTLINE,
-                                                border_color=ft.Colors.TRANSPARENT,
-                                                text_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK
-                                                ),
-                                                hint_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK_45
-                                                ),
-                                                label_style=ft.TextStyle(
-                                                    color=ft.Colors.BLACK_45
-                                                ),
-                                                bgcolor=ft.Colors.WHITE,
-                                                on_change=self.handle_password,
-                                            )
+                                            self.password
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                     ),
                                     ft.Row(
                                         controls=[
-                                            ft.Button(
-                                                content=ft.Text(
-                                                    value="Entrar",
-                                                    color=ft.Colors.WHITE
-                                                ),
-                                                width=180,
-                                                height=45,
-                                                bgcolor=ft.Colors.GREEN,
-                                                elevation=5,
-                                                style=ft.ButtonStyle(
-                                                    shape=ft.RoundedRectangleBorder(
-                                                        radius=30
-                                                    ),
-                                                    shadow_color=ft.Colors.GREY_700,
-                                                ),
-                                                on_click=self.handle_login
-                                            )
+                                            self.login_button
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER
                                     ),
@@ -141,7 +152,7 @@ class LoginPage(ft.View):
                                             ft.Text("Ainda não tem uma conta?"),
                                             ft.TextButton(
                                                 content=ft.Text("Cadastre-se")
-                                            )
+                                            ),
                                         ],
                                         spacing=2,
                                         alignment=ft.MainAxisAlignment.CENTER
@@ -173,19 +184,62 @@ class LoginPage(ft.View):
             )
         ]
 
-    async def handle_user(self, e):
-        self.login = e.control.value
-
-    async def handle_password(self, e):
-        self.password = e.control.value
-
     async def handle_login(self, e):
 
-        if not self.password:
-            print("informe a senha")
+        snackbar = ft.SnackBar(
+            content=ft.Text("Aviso"),
+            duration=2000,
+            show_close_icon=True,
+        )
+
+        if not self.login.value:
+            snackbar.content = ft.Text(
+                value="O campo de usuário é obrigatório!",
+                color=ft.Colors.BLACK,
+            )
+            snackbar.bgcolor = ft.Colors.YELLOW_400
+            self.page.show_dialog(snackbar)
+            self.page.update()
             return
 
-        r = await auth_login(self.page, self.login, self.password)
+        if not self.password.value:
+            snackbar.content = ft.Text(
+                value="O campo de senha é obrigatório!",
+                color=ft.Colors.BLACK,
+            )
+            snackbar.bgcolor = ft.Colors.YELLOW_400
+            self.page.show_dialog(snackbar)
+            self.page.update()
+            return
 
-        print(r)
+        r: Response = await auth_login(self.page, self.login.value, self.password.value)
+        req = r.json()
+
+        if r.status_code == 200:
+            snackbar.content = ft.Text("Usuário logado com sucesso!")
+            snackbar.bgcolor = Colors.VERDE_BOTI
+            self.page.show_dialog(snackbar)
+            self.page.update()
+
+            await self.storage.set_token(req["access_token"], req["refresh_token"])
+
+            if not await self.storage.is_authenticated():
+                snackbar.content = ft.Text(
+                    value="Ocorreu um erro ao salvar suas credenciais!",
+                    color=ft.Colors.WHITE
+                )
+                snackbar.bgcolor = ft.Colors.YELLOW_400
+                self.page.show_dialog(snackbar)
+                self.page.update()
+                return
+
+            await self.page.push_route("/")
+        else:
+            snackbar.content = ft.Text(
+                value=f"Erro: {req['detail']}!",
+                color=ft.Colors.WHITE
+            )
+            snackbar.bgcolor = Colors.VERMELHO_OUI
+            self.page.show_dialog(snackbar)
+            self.page.update()
 

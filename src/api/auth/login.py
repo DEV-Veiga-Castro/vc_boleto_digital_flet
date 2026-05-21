@@ -15,4 +15,4 @@ async def auth_login(page: ft.Page, login: str, password: str):
         }
     )
 
-    return r.json()
+    return r

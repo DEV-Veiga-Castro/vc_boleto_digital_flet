@@ -2,6 +2,9 @@ from typing import List
 
 import flet as ft
 
+from api.clientstorage import ClientStorage
+from api.routes.branch_route import list_branchs
+from api.schemas.branch import Branch
 from components.header import Header
 from style.style import Colors
 
@@ -20,58 +23,61 @@ class SendInitialPage(ft.View):
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         self.expand = True
 
-        self.route = "/initial_config"
+        self.route = "/send/initial"
 
-        tipos_mov = [
+        self.prefs = ft.SharedPreferences()
+        self.storage = ClientStorage(self.prefs)
+
+        self.tipos_mov = [
             "REGULAR",
             "BAIXA",
             "VENDA"
         ]
 
-        lojas = [
-            "LOJA 1",
-            "LOJA 2",
-            "LOJA 3"
-        ]
+        self.select_tipo_movimentacao = ft.PopupMenuButton(
+                                            items=[
+                                                ft.PopupMenuItem(
+                                                    content=ft.Text(
+                                                        value="REGULAR"
+                                                    )
+                                                )
+                                            ],
+                                            icon=ft.Icon(
+                                                icon=ft.Icons.KEYBOARD_ARROW_DOWN_ROUNDED,
+                                                color=Colors.VERDE_BOTI,
+                                                size=40
+                                            ),
+                                            menu_position=ft.PopupMenuPosition.OVER,
+                                        )
 
-        def set_items_menu(data: List[str], texto_value: ft.Text) -> List[ft.PopupMenuItem]:
-            items_menu = [
-                ft.PopupMenuItem(
-                    content=mov,
-                    data=mov,
-                    on_click=lambda e: set_value(e, texto_value),
-                    expand=True, 
-                ) for mov in data
-            ]
+        self.select_loja_destino: ft.PopupMenuButton = ft.PopupMenuButton(
+                                        icon=ft.Icon(
+                                            icon=ft.Icons.STORE_OUTLINED,
+                                            color=Colors.VERDE_BOTI,
+                                            size=40
+                                        ),
+                                        menu_position=ft.PopupMenuPosition.OVER,
+                                    )
 
-            page.update()
-
-            return items_menu
-
-        texto_movimentacao = ft.Text(
+        self.texto_movimentacao = ft.Text(
             value="REGULAR", 
             size=20, 
             color=ft.Colors.WHITE
         )
 
-        texto_loja = ft.Text(
+        self.texto_loja = ft.Text(
             value="Selecionar unidade",
             size=20,
             color=ft.Colors.WHITE
         )
 
-        texto_usuario = ft.Text(
+        self.texto_usuario = ft.Text(
             value="Usuário",
             size=20,
             color=ft.Colors.WHITE
         )
 
-        def set_value(e, texto_value):
-            print(e.control.data)
-            texto_value.value = e.control.data
-            page.update()
-
-
+        
         self.controls = [
             ft.SafeArea(
                 content=ft.Column(
@@ -120,7 +126,7 @@ class SendInitialPage(ft.View):
                                                     ft.Text(
                                                         "TIPO MOVIMENTAÇÃO"
                                                     ),
-                                                    texto_movimentacao
+                                                    self.texto_movimentacao
                                                 ],
                                                 alignment=ft.MainAxisAlignment.CENTER,
                                                 expand=True,
@@ -128,15 +134,7 @@ class SendInitialPage(ft.View):
                                                     left=20
                                                 ),
                                             ),
-                                            ft.PopupMenuButton(
-                                                icon=ft.Icon(
-                                                    icon=ft.Icons.KEYBOARD_ARROW_DOWN_ROUNDED,
-                                                    color=Colors.VERDE_BOTI,
-                                                    size=40
-                                                ),
-                                                items=set_items_menu(tipos_mov, texto_movimentacao),
-                                                menu_position=ft.PopupMenuPosition.OVER,
-                                            )
+                                            self.select_tipo_movimentacao
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     ),
@@ -167,7 +165,7 @@ class SendInitialPage(ft.View):
                                                     ft.Text(
                                                         "LOJA DE DESTINO"
                                                     ),
-                                                    texto_loja
+                                                    self.texto_loja
                                                 ],
                                                 alignment=ft.MainAxisAlignment.CENTER,
                                                 expand=True,
@@ -175,15 +173,7 @@ class SendInitialPage(ft.View):
                                                     left=20
                                                 ),
                                             ),
-                                            ft.PopupMenuButton(
-                                                icon=ft.Icon(
-                                                    icon=ft.Icons.STORE_OUTLINED,
-                                                    color=Colors.VERDE_BOTI,
-                                                    size=40
-                                                ),
-                                                items=set_items_menu(lojas, texto_loja),
-                                                menu_position=ft.PopupMenuPosition.OVER,
-                                            )
+                                            self.select_loja_destino
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     ),
@@ -214,7 +204,7 @@ class SendInitialPage(ft.View):
                                                     ft.Text(
                                                         "RESPONSÁVEL PELO ENVIO"
                                                     ),
-                                                    texto_usuario
+                                                    self.texto_usuario
                                                 ],
                                                 alignment=ft.MainAxisAlignment.CENTER,
                                                 expand=True,
@@ -345,3 +335,64 @@ class SendInitialPage(ft.View):
                 ),
                 bgcolor=ft.Colors.TRANSPARENT,
             )
+
+        page.run_task(self.load_data)
+
+    
+    async def load_data(self) -> None:
+        snackbar = ft.SnackBar(
+            content=ft.Text(
+                value="OI",
+                color=ft.Colors.WHITE
+            ),
+            bgcolor=Colors.VERMELHO_OUI,
+            show_close_icon=True
+        )
+
+        is_authenticated = await self.storage.is_authenticated()
+
+        if not is_authenticated:
+            self.storage.clear_token()
+            self.page.run_task(self.page.push_route("/login"))
+            return
+
+        await self.set_menu_tipos_movimentacao()
+        await self.set_menu_lojas()
+        
+    async def set_menu_tipos_movimentacao(self) -> None:
+        items = [
+            ft.PopupMenuItem(
+                content=mov,
+                data=mov,
+                expand=True, 
+            ) for mov in self.tipos_mov
+        ]
+
+        self.select_tipo_movimentacao.items = items
+        self.select_tipo_movimentacao.update()
+        
+    async def set_menu_lojas(self) -> None:
+
+        token = await self.storage.get_access_token()
+        branchs: List[Branch] = await list_branchs(token)
+
+        if not branchs:
+            await self.storage.clear_token()
+            await self.page.push_route("/logout")
+
+        items = [
+            ft.PopupMenuItem(
+                content=ft.Text(
+                    value=f"{loja.pdv} - {loja.name}"
+                ),
+                data=loja.pdv,
+                expand=True
+            ) for loja in branchs
+        ]
+
+        self.select_loja_destino.items = items
+        self.select_loja_destino.update()
+
+    # async def set_value(self, e):
+    #         print(e.control.data)
+    #         self.page.update()
